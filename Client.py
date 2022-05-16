@@ -23,6 +23,22 @@ def enviar_d(direccion, nom_archivo):
     return 0
 
 
+def enviar_l(nom_archivo):
+    archivo = open(nom_archivo)
+    # datos = archivo.read()
+
+    cliente.send(nom_archivo.encode(Formato))
+    msj = cliente.recv(Tamanio).decode(Formato)
+    print(f"[Server]: {msj}")
+
+    # cliente.send(datos.encode(Formato))
+    # msj_alt = cliente.recv(Tamanio).decode(Formato)
+    # print(f"[Server]: {msj_alt}")
+
+    archivo.close()
+    return 0
+
+
 def firma(direccion):
     with open(direccion, "rb") as archivo:
         contenido = archivo.read(Tamanio)
@@ -51,7 +67,7 @@ while True:
         enviar_d(dir_archivo, n_archivo)
     if opc == 2:
         cliente.send(str(opc).encode(Formato))
-        enviar_d(dir_archivo, n_archivo)
+        enviar_l(n_archivo)
     if opc == 3:
         cliente.send(str(opc).encode(Formato))
         enviar_d(dir_archivo, n_archivo)
