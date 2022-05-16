@@ -6,6 +6,7 @@ from nacl.encoding import Base64Encoder
 import nacl.utils
 import nacl.secret
 import nacl.pwhash
+import PRNG
 
 formato = "utf-8"
 tamanio = 1024
@@ -37,7 +38,7 @@ def descifrar(n_archivo):
     datos_cc = archivo_cc.read()
     archivo_cc.close()
 
-    datos_ss = cont.decrypt(datos_cc)
+    datos_ss = cont.decrypt(datos_cc, PRNG.nonce(nacl.secret.SecretBox.NONCE_SIZE))
 
     archivo_ss = open("SC-"+n_archivo, "wb")
     archivo_ss.write(datos_ss)
@@ -57,7 +58,6 @@ def uno():
     archivo.close()
 
     cifrar(n_archivo)
-    conx.close()
     return 0
 
 
@@ -67,13 +67,13 @@ def dos():
     archivo = open(n_archivo, "w")
     conx.send("Nombre de archivo recibido".encode(formato))
 
-    datos = conx.recv(tamanio).decode(formato)
-    print(f"[Recibido] Datos recibidos")
-    archivo.write(datos)
-    conx.send("Datos recibidos".encode(formato))
-    archivo.close()
+    # datos = conx.recv(tamanio).decode(formato)
+    # print(f"[Recibido] Datos recibidos")
+    # archivo.write(datos)
+    # conx.send("Datos recibidos".encode(formato))
+    # archivo.close()
     descifrar(n_archivo)
-    conx.close()
+
     return 0
 
 
@@ -95,7 +95,6 @@ def tres():
     archivo.write(bytes(firma_b64))
     conx.send("Datos recibidos".encode(formato))
     archivo.close()
-    conx.close()
     return 0
 
 
@@ -113,15 +112,13 @@ print("[Escuchando...]")
 
 while True:
     conx, direc = server.accept()
-    opc = conx.recv(1)  # opc = conx.recv(1)
+    opc = conx.recv(1)  # opc = conx.recv(4)
     print(f"[Nueva conexion] {dir} conectado: Opcion {opc}")
     if opc == b'1':
         uno()
-        conx.close()
     if opc == b'2':
         dos()
     if opc == b'3':
         tres()
     if opc == b'4':
         cuatro()
-        conx.close()
