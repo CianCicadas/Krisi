@@ -27,7 +27,7 @@ def cifrar(n_archivo):
 
     datos_cc = cont.encrypt(datos_sc)
 
-    archivo_cc = open(local+"CC-"+n_archivo, "wb")
+    archivo_cc = open("CC-"+n_archivo, "wb")
     archivo_cc.write(datos_cc)
     archivo_cc.close()
 
@@ -39,7 +39,7 @@ def descifrar(n_archivo):
 
     datos_ss = cont.decrypt(datos_cc)
 
-    archivo_ss = open(local+"CC-"+n_archivo, "wb")
+    archivo_ss = open("SC-"+n_archivo, "wb")
     archivo_ss.write(datos_ss)
     archivo_ss.close()
 
@@ -48,12 +48,12 @@ def uno():
     n_archivo = conx.recv(tamanio).decode(formato)
     print(f"[Recibido] {n_archivo} recibido")
     archivo = open(n_archivo, "w")
-    # conx.send("Nombre de archivo recibido".encode(formato))
+    conx.send("Nombre de archivo recibido".encode(formato))
 
     datos = conx.recv(tamanio).decode(formato)
     print(f"[Recibido] Datos recibidos")
     archivo.write(datos)
-    # conx.send("Datos recibidos".encode(formato))
+    conx.send("Datos recibidos".encode(formato))
     archivo.close()
 
     cifrar(n_archivo)
@@ -80,18 +80,19 @@ def dos():
 def tres():
     n_archivo = conx.recv(tamanio).decode(formato)
     print(f"[Recibido] {n_archivo} recibido")
-    archivo = open(n_archivo, "w")
+    archivo = open("DF-"+n_archivo, "wb")
     conx.send("Nombre de archivo recibido".encode(formato))
 
     datos = conx.recv(tamanio).decode(formato)
     print(f"[Recibido] Datos recibidos")
+    conx.send("Datos de archivo recibido".encode(formato))
 
     llave_firma = SigningKey.generate()
     firma_b64 = llave_firma.sign(bytes(datos), encoder=Base64Encoder)
     llave_ver = llave_firma.verify_key
     llave_ver_b64 = llave_ver.encode(encoder=Base64Encoder)
 
-    archivo.write(str(firma_b64))
+    archivo.write(bytes(firma_b64))
     conx.send("Datos recibidos".encode(formato))
     archivo.close()
     conx.close()
@@ -114,24 +115,13 @@ while True:
     conx, direc = server.accept()
     opc = conx.recv(1)  # opc = conx.recv(1)
     print(f"[Nueva conexion] {dir} conectado: Opcion {opc}")
-    if opc == 1:
-        n_archivo = conx.recv(tamanio).decode(formato)
-        print(f"[Recibido] {n_archivo} recibido")
-        archivo = open(n_archivo, "w")
-        conx.send("Nombre de archivo recibido".encode(formato))
-
-        datos = conx.recv(tamanio).decode(formato)
-        print(f"[Recibido] Datos recibidos")
-        archivo.write(datos)
-        conx.send("Datos recibidos".encode(formato))
-        archivo.close()
-
-        cifrar(n_archivo)
+    if opc == b'1':
+        uno()
         conx.close()
-    if opc == 2:
+    if opc == b'2':
         dos()
-    if opc == 3:
+    if opc == b'3':
         tres()
-    if opc == 4:
+    if opc == b'4':
         cuatro()
         conx.close()
