@@ -50,13 +50,13 @@ while True:
         cliente.send(str(opc).encode(Formato))
         enviar_d(dir_archivo, n_archivo)
     if opc == 2:
-        cliente.send(bytes(opc))
+        cliente.send(str(opc).encode(Formato))
         enviar_d(dir_archivo, n_archivo)
     if opc == 3:
-        cliente.send(bytes(opc))
+        cliente.send(str(opc).encode(Formato))
         enviar_d(dir_archivo, n_archivo)
     if opc == 4:
-        cliente.send(bytes(opc))
+        cliente.send(str(opc).encode(Formato))
         firma(dir_archivo)
     if (opc < 0) or (opc > 4):
         print("Seleccione una opción valida:\n[1]Cifrado\t[2]Descifrado\n[3]Firma\t[4]Vefiricación de firma\n[0]Salir")
